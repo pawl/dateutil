@@ -15,11 +15,14 @@ from functools import wraps
 
 import re
 import six
+from dateutil.tz.tz import tzoffset, tzutc
+from typing import Callable, List, Optional, Tuple, Union
 
 __all__ = ["isoparse", "isoparser"]
 
 
 def _takes_ascii(f):
+    # type: (Callable) -> Callable
     @wraps(f)
     def func(self, str_in, *args, **kwargs):
         # If it's a stream, read the whole thing
@@ -41,6 +44,7 @@ def _takes_ascii(f):
 
 class isoparser(object):
     def __init__(self, sep=None):
+        # type: (Optional[Union[str, bytes]]) -> None
         """
         :param sep:
             A single character that separates date and time portions. If
@@ -58,6 +62,7 @@ class isoparser(object):
 
     @_takes_ascii
     def isoparse(self, dt_str):
+        # type: (bytes) -> datetime
         """
         Parse an ISO-8601 datetime string into a :class:`datetime.datetime`.
 
@@ -147,6 +152,7 @@ class isoparser(object):
 
     @_takes_ascii
     def parse_isodate(self, datestr):
+        # type: (bytes) -> date
         """
         Parse the date portion of an ISO string.
 
@@ -164,6 +170,7 @@ class isoparser(object):
 
     @_takes_ascii
     def parse_isotime(self, timestr):
+        # type: (bytes) -> time
         """
         Parse the time portion of an ISO string.
 
@@ -180,6 +187,7 @@ class isoparser(object):
 
     @_takes_ascii
     def parse_tzstr(self, tzstr, zero_as_utc=True):
+        # type: (bytes, bool) -> Union[tzutc, tzoffset]
         """
         Parse a valid ISO time zone string.
 
@@ -204,12 +212,14 @@ class isoparser(object):
     _FRACTION_REGEX = re.compile(b'[\\.,]([0-9]+)')
 
     def _parse_isodate(self, dt_str):
+        # type: (bytes) -> Tuple[List[int], int]
         try:
             return self._parse_isodate_common(dt_str)
         except ValueError:
             return self._parse_isodate_uncommon(dt_str)
 
     def _parse_isodate_common(self, dt_str):
+        # type: (bytes) -> Tuple[List[int], int]
         len_str = len(dt_str)
         components = [1, 1, 1]
 
@@ -251,6 +261,7 @@ class isoparser(object):
         return components, pos + 2
 
     def _parse_isodate_uncommon(self, dt_str):
+        # type: (bytes) -> Tuple[List[int], int]
         if len(dt_str) < 4:
             raise ValueError('ISO string too short')
 
@@ -295,6 +306,7 @@ class isoparser(object):
         return components, pos
 
     def _calculate_weekdate(self, year, week, day):
+        # type: (int, int, int) -> date
         """
         Calculate the day of corresponding to the ISO year-week-day calendar.
 
@@ -328,6 +340,7 @@ class isoparser(object):
         return week_1 + timedelta(days=week_offset)
 
     def _parse_isotime(self, timestr):
+        # type: (bytes) -> Union[List[Union[int, tzoffset]], List[Optional[int]], List[Union[int, tzutc]]]
         len_str = len(timestr)
         components = [0, 0, 0, 0, None]
         pos = 0
@@ -376,6 +389,7 @@ class isoparser(object):
         return components
 
     def _parse_tzstr(self, tzstr, zero_as_utc=True):
+        # type: (bytes, bool) -> Union[tzutc, tzoffset]
         if tzstr == b'Z' or tzstr == b'z':
             return tz.UTC
 

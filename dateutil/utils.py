@@ -8,9 +8,14 @@ datetimes.
 from __future__ import unicode_literals
 
 from datetime import datetime, time
+from datetime import timedelta
+from dateutil.tz.tz import tzfile, tzutc
+from freezegun.api import FakeDatetime
+from typing import Optional, Union
 
 
 def today(tzinfo=None):
+    # type: (Optional[Union[tzfile, tzutc]]) -> FakeDatetime
     """
     Returns a :py:class:`datetime` representing the current day at midnight
 
@@ -27,6 +32,7 @@ def today(tzinfo=None):
 
 
 def default_tzinfo(dt, tzinfo):
+    # type: (datetime, tzfile) -> datetime
     """
     Sets the ``tzinfo`` parameter on naive datetimes only
 
@@ -62,6 +68,7 @@ def default_tzinfo(dt, tzinfo):
 
 
 def within_delta(dt1, dt2, delta):
+    # type: (datetime, datetime, timedelta) -> bool
     """
     Useful for comparing two datetimes that may have a negligible difference
     to be considered equal.

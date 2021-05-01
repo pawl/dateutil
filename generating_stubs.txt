@@ -1,0 +1,5 @@
+* add monkeytype to requirements-dev.txt
+* replace "python -m pytest" in tox.ini with "monkeytype run -m pytest"
+* mkdir stubs
+* monkeytype list-modules | xargs -n1 -I{} sh -c 'monkeytype stub {} > stubs/{}.pyi'
+* run move_files.py

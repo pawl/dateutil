@@ -9,6 +9,9 @@ from six import integer_types
 from warnings import warn
 
 from ._common import weekday
+from datetime import date, datetime
+from dateutil._common import weekday
+from typing import Optional, Union
 
 MO, TU, WE, TH, FR, SA, SU = weekdays = tuple(weekday(x) for x in range(7))
 
@@ -108,6 +111,7 @@ class relativedelta(object):
                  year=None, month=None, day=None, weekday=None,
                  yearday=None, nlyearday=None,
                  hour=None, minute=None, second=None, microsecond=None):
+        # type: (Optional[Union[date, str, datetime]], Optional[Union[date, str, datetime]], Union[float, int], Union[float, int], Union[float, int], int, Union[float, int], Union[float, int], Union[float, int], Union[float, int], Union[float, int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[weekday, int]], Optional[int], Optional[int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]]) -> None
 
         if dt1 and dt2:
             # datetime is a subclass of date. So both must be date
@@ -229,6 +233,7 @@ class relativedelta(object):
         self._fix()
 
     def _fix(self):
+        # type: () -> None
         if abs(self.microseconds) > 999999:
             s = _sign(self.microseconds)
             div, mod = divmod(self.microseconds * s, 1000000)
@@ -270,6 +275,7 @@ class relativedelta(object):
         self.days = self.days - (self.weeks * 7) + value * 7
 
     def _set_months(self, months):
+        # type: (int) -> None
         self.months = months
         if abs(self.months) > 11:
             s = _sign(self.months)
@@ -280,6 +286,7 @@ class relativedelta(object):
             self.years = 0
 
     def normalized(self):
+        # type: () -> relativedelta
         """
         Return a version of this object represented entirely using integer
         values for the relative attributes.
@@ -594,6 +601,7 @@ class relativedelta(object):
 
 
 def _sign(x):
+    # type: (Union[float, int]) -> int
     return int(copysign(1, x))
 
 # vim:ts=4:sw=4:et

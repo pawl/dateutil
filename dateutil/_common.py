@@ -1,12 +1,14 @@
 """
 Common code used in multiple modules.
 """
+from typing import Optional
 
 
 class weekday(object):
     __slots__ = ["weekday", "n"]
 
     def __init__(self, weekday, n=None):
+        # type: (int, Optional[int]) -> None
         self.weekday = weekday
         self.n = n
 

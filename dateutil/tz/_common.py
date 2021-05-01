@@ -3,6 +3,7 @@ from six import PY2
 from functools import wraps
 
 from datetime import datetime, timedelta, tzinfo
+from typing import Callable, Optional, Tuple
 
 
 ZERO = timedelta(0)
@@ -11,6 +12,7 @@ __all__ = ['tzname_in_python2', 'enfold']
 
 
 def tzname_in_python2(namefunc):
+    # type: (Callable) -> Callable
     """Change unicode output into bytestrings in Python 2
 
     tzname() API changed in Python 3. It used to return bytes, but was changed
@@ -35,6 +37,7 @@ def tzname_in_python2(namefunc):
 if hasattr(datetime, 'fold'):
     # This is the pre-python 3.6 fold situation
     def enfold(dt, fold=1):
+        # type: (datetime, int) -> datetime
         """
         Provides a unified interface for assigning the ``fold`` attribute to
         datetimes both before and after the implementation of PEP-495.
@@ -100,6 +103,7 @@ else:
             return 1
 
     def enfold(dt, fold=1):
+        # type: (datetime, int) -> datetime
         """
         Provides a unified interface for assigning the ``fold`` attribute to
         datetimes both before and after the implementation of PEP-495.
@@ -130,6 +134,7 @@ else:
 
 
 def _validate_fromutc_inputs(f):
+    # type: (Callable) -> Callable
     """
     The CPython version of ``fromutc`` checks that the input is a ``datetime``
     object and that ``self`` is attached as its ``tzinfo``.
@@ -152,6 +157,7 @@ class _tzinfo(tzinfo):
     """
 
     def is_ambiguous(self, dt):
+        # type: (datetime) -> bool
         """
         Whether or not the "wall time" of a given datetime is ambiguous in this
         zone.
@@ -177,6 +183,7 @@ class _tzinfo(tzinfo):
         return same_dt and not same_offset
 
     def _fold_status(self, dt_utc, dt_wall):
+        # type: (datetime, datetime) -> int
         """
         Determine the fold status of a "wall" datetime, given a representation
         of the same datetime as a (naive) UTC datetime. This is calculated based
@@ -202,9 +209,11 @@ class _tzinfo(tzinfo):
         return _fold
 
     def _fold(self, dt):
+        # type: (datetime) -> int
         return getattr(dt, 'fold', 0)
 
     def _fromutc(self, dt):
+        # type: (datetime) -> datetime
         """
         Given a timezone-aware datetime in a given timezone, calculates a
         timezone-aware datetime in a new timezone.
@@ -243,6 +252,7 @@ class _tzinfo(tzinfo):
 
     @_validate_fromutc_inputs
     def fromutc(self, dt):
+        # type: (datetime) -> datetime
         """
         Given a timezone-aware datetime in a given timezone, calculates a
         timezone-aware datetime in a new timezone.
@@ -290,6 +300,7 @@ class tzrangebase(_tzinfo):
         raise NotImplementedError('tzrangebase is an abstract base class')
 
     def utcoffset(self, dt):
+        # type: (Optional[datetime]) -> Optional[timedelta]
         isdst = self._isdst(dt)
 
         if isdst is None:
@@ -300,6 +311,7 @@ class tzrangebase(_tzinfo):
             return self._std_offset
 
     def dst(self, dt):
+        # type: (datetime) -> timedelta
         isdst = self._isdst(dt)
 
         if isdst is None:
@@ -311,12 +323,14 @@ class tzrangebase(_tzinfo):
 
     @tzname_in_python2
     def tzname(self, dt):
+        # type: (datetime) -> str
         if self._isdst(dt):
             return self._dst_abbr
         else:
             return self._std_abbr
 
     def fromutc(self, dt):
+        # type: (datetime) -> datetime
         """ Given a datetime in UTC, return local time """
         if not isinstance(dt, datetime):
             raise TypeError("fromutc() requires a datetime argument")
@@ -350,6 +364,7 @@ class tzrangebase(_tzinfo):
         return enfold(dt_wall, fold=_fold)
 
     def is_ambiguous(self, dt):
+        # type: (datetime) -> bool
         """
         Whether or not the "wall time" of a given datetime is ambiguous in this
         zone.
@@ -372,6 +387,7 @@ class tzrangebase(_tzinfo):
         return (end <= dt < end + self._dst_base_offset)
 
     def _isdst(self, dt):
+        # type: (Optional[datetime]) -> Optional[bool]
         if not self.hasdst:
             return False
         elif dt is None:
@@ -393,6 +409,7 @@ class tzrangebase(_tzinfo):
             return isdst
 
     def _naive_isdst(self, dt, transitions):
+        # type: (datetime, Tuple[datetime, datetime]) -> bool
         dston, dstoff = transitions
 
         dt = dt.replace(tzinfo=None)

@@ -3,10 +3,13 @@ import weakref
 from collections import OrderedDict
 
 from six.moves import _thread
+from dateutil.tz.tz import tzoffset, tzstr
+from typing import Any, Union
 
 
 class _TzSingleton(type):
     def __init__(cls, *args, **kwargs):
+        # type: (Any, *Any, **Any) -> None
         cls.__instance = None
         super(_TzSingleton, cls).__init__(*args, **kwargs)
 
@@ -18,12 +21,14 @@ class _TzSingleton(type):
 
 class _TzFactory(type):
     def instance(cls, *args, **kwargs):
+        # type: (Any, *Any, **Any) -> Union[tzoffset, tzstr]
         """Alternate constructor that returns a fresh instance"""
         return type.__call__(cls, *args, **kwargs)
 
 
 class _TzOffsetFactory(_TzFactory):
     def __init__(cls, *args, **kwargs):
+        # type: (Any, *Any, **Any) -> None
         cls.__instances = weakref.WeakValueDictionary()
         cls.__strong_cache = OrderedDict()
         cls.__strong_cache_size = 8
@@ -54,6 +59,7 @@ class _TzOffsetFactory(_TzFactory):
 
 class _TzStrFactory(_TzFactory):
     def __init__(cls, *args, **kwargs):
+        # type: (Any, *Any, **Any) -> None
         cls.__instances = weakref.WeakValueDictionary()
         cls.__strong_cache = OrderedDict()
         cls.__strong_cache_size = 8

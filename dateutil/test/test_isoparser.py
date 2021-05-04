@@ -403,7 +403,7 @@ def test_isodate_raises(isostr, exception):
         isoparser().parse_isodate(isostr)
 
     # ensure the error message does not contain b' prefixes
-    assert str(bytes(isostr, 'utf-8')) not in str(excinfo.value)
+    assert "b'{}'".format(isostr) not in str(excinfo.value)
 
 
 ###

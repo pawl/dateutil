@@ -1,5 +1,7 @@
-* add monkeytype to requirements-dev.txt
+* add "MonkeyType" to requirements-dev.txt
 * replace "python -m pytest" in tox.ini with "monkeytype run -m pytest"
+    [testenv]
+    commands = monkeytype run -m pytest {posargs: "{toxinidir}/dateutil/test" "{toxinidir}/docs" --cov-config="{toxinidir}/tox.ini" --cov=dateutil}
 * mkdir stubs
 * monkeytype list-modules | xargs -n1 -I{} sh -c 'monkeytype stub {} > stubs/{}.pyi'
 * run move_files.py

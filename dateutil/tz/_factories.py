@@ -1,11 +1,12 @@
 from datetime import timedelta
 import weakref
 from collections import OrderedDict
-from typing import Any, Union  # noqa: for type checking
+from typing import TYPE_CHECKING, Any, Union  # noqa: for type checking
 
 from six.moves import _thread
 
-from dateutil.tz import tzoffset, tzstr  # noqa: for type checking
+if TYPE_CHECKING:
+    from dateutil.tz import tzoffset, tzstr  # noqa: for type checking
 
 
 class _TzSingleton(type):

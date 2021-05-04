@@ -15,7 +15,7 @@ import os
 import bisect
 import weakref
 from collections import OrderedDict
-from typing import Any, List, Optional, Tuple, Union  # noqa: for type checking
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union  # noqa: for type checking
 
 import six
 from six import string_types
@@ -34,10 +34,12 @@ except ImportError:
 # For warning about rounding tzinfo
 from warnings import warn
 from io import BufferedReader, BytesIO, StringIO
-from dateutil.parser._parser import _tzparser
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rruleset
 from tarfile import ExFileObject
+
+if TYPE_CHECKING:
+    from dateutil.parser._parser import _tzparser
 
 ZERO = datetime.timedelta(0)
 EPOCH = datetime.datetime.utcfromtimestamp(0)
@@ -1449,6 +1451,7 @@ class tzical(object):
                         # Process component
                         rr = None
                         if rrulelines:
+                            # TODO: fix issue with global rrule: https://github.com/python/mypy/issues/5732#issuecomment-426962042
                             rr = rrule.rrulestr("\n".join(rrulelines),
                                                 compatible=True,
                                                 ignoretz=True,

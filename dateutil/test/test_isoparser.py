@@ -399,8 +399,11 @@ def test_parse_isodate(d, dt_fmt, as_bytes):
     ('2014-04-19T', ValueError),                # Unknown components
 ])
 def test_isodate_raises(isostr, exception):
-    with pytest.raises(exception):
+    with pytest.raises(exception) as excinfo:
         isoparser().parse_isodate(isostr)
+
+    # ensure the error message does not contain b' prefixes
+    assert str(bytes(isostr, 'utf-8')) not in str(excinfo.value)
 
 
 ###

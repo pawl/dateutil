@@ -103,14 +103,31 @@ class relativedelta(object):
 
     """
 
-    def __init__(self, dt1=None, dt2=None,
-                 years=0, months=0, days=0, leapdays=0, weeks=0,
-                 hours=0, minutes=0, seconds=0, microseconds=0,
-                 year=None, month=None, day=None, weekday=None,
-                 yearday=None, nlyearday=None,
-                 hour=None, minute=None, second=None, microsecond=None):
-        # type: (Optional[Union[datetime.date, str, datetime.datetime]], Optional[Union[datetime.date, str, datetime.datetime]], Union[float, int], Union[float, int], Union[float, int], int, Union[float, int], Union[float, int], Union[float, int], Union[float, int], Union[float, int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[weekday, int]], Optional[int], Optional[int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]]) -> None
-
+    def __init__(
+        self,
+        dt1=None,  # type:  Optional[Union[datetime.date, str, datetime.datetime]]
+        dt2=None,  # type:  Optional[Union[datetime.date, str, datetime.datetime]]
+        years=0,  # type:  Union[float, int]
+        months=0,  # type:  Union[float, int]
+        days=0,  # type:  Union[float, int]
+        leapdays=0,  # type:  int
+        weeks=0,  # type:  Union[float, int]
+        hours=0,  # type:  Union[float, int]
+        minutes=0,  # type:  Union[float, int]
+        seconds=0,  # type:  Union[float, int]
+        microseconds=0,  # type:  Union[float, int]
+        year=None,  # type:  Optional[Union[float, int]]
+        month=None,  # type:  Optional[Union[float, int]]
+        day=None,  # type:  Optional[Union[float, int]]
+        weekday=None,  # type:  Optional[Union[weekday, int]]
+        yearday=None,  # type:  Optional[int]
+        nlyearday=None,  # type:  Optional[int]
+        hour=None,  # type:  Optional[Union[float, int]]
+        minute=None,  # type:  Optional[Union[float, int]]
+        second=None,  # type:  Optional[Union[float, int]]
+        microsecond=None,  # type:  Optional[Union[float, int]]
+    ):
+        # type: (...) -> None
         if dt1 and dt2:
             # datetime is a subclass of date. So both must be date
             if not (isinstance(dt1, datetime.date) and

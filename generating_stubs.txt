@@ -6,3 +6,4 @@
 * add mypy task to tox.ini
 * start running mypy with "tox -e mypy"
 * remove duplicate imports added by merge-pyi, fix import sorting issues
+* clean up super long type hints by inlining with params

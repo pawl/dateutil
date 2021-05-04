@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import calendar
+from typing import Optional, Union  # noqa: for type checking
 
 import operator
 from math import copysign
@@ -9,9 +10,6 @@ from six import integer_types
 from warnings import warn
 
 from ._common import weekday
-from datetime import date, datetime
-from dateutil._common import weekday
-from typing import Optional, Union
 
 MO, TU, WE, TH, FR, SA, SU = weekdays = tuple(weekday(x) for x in range(7))
 
@@ -51,7 +49,7 @@ class relativedelta(object):
             the corresponding arithmetic operation on the original datetime value
             with the information in the relativedelta.
 
-        weekday: 
+        weekday:
             One of the weekday instances (MO, TU, etc) available in the
             relativedelta module. These instances may receive a parameter N,
             specifying the Nth weekday, which could be positive or negative
@@ -111,7 +109,7 @@ class relativedelta(object):
                  year=None, month=None, day=None, weekday=None,
                  yearday=None, nlyearday=None,
                  hour=None, minute=None, second=None, microsecond=None):
-        # type: (Optional[Union[date, str, datetime]], Optional[Union[date, str, datetime]], Union[float, int], Union[float, int], Union[float, int], int, Union[float, int], Union[float, int], Union[float, int], Union[float, int], Union[float, int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[weekday, int]], Optional[int], Optional[int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]]) -> None
+        # type: (Optional[Union[datetime.date, str, datetime.datetime]], Optional[Union[datetime.date, str, datetime.datetime]], Union[float, int], Union[float, int], Union[float, int], int, Union[float, int], Union[float, int], Union[float, int], Union[float, int], Union[float, int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[weekday, int]], Optional[int], Optional[int], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]], Optional[Union[float, int]]) -> None
 
         if dt1 and dt2:
             # datetime is a subclass of date. So both must be date

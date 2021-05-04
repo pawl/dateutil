@@ -3,7 +3,7 @@ from six import PY2
 from functools import wraps
 
 from datetime import datetime, timedelta, tzinfo
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple  # noqa: for type checking
 
 
 ZERO = timedelta(0)

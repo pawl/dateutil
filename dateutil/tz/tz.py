@@ -15,6 +15,7 @@ import os
 import bisect
 import weakref
 from collections import OrderedDict
+from typing import Any, List, Optional, Tuple, Union  # noqa: for type checking
 
 import six
 from six import string_types
@@ -33,13 +34,10 @@ except ImportError:
 # For warning about rounding tzinfo
 from warnings import warn
 from io import BufferedReader, BytesIO, StringIO
-from datetime import datetime, timedelta
 from dateutil.parser._parser import _tzparser
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rruleset
-from freezegun.api import FakeDatetime
 from tarfile import ExFileObject
-from typing import Any, List, Optional, Tuple, Union
 
 ZERO = datetime.timedelta(0)
 EPOCH = datetime.datetime.utcfromtimestamp(0)
@@ -80,20 +78,20 @@ class tzutc(datetime.tzinfo):
             True
     """
     def utcoffset(self, dt):
-        # type: (Optional[Union[FakeDatetime, datetime]]) -> timedelta
+        # type: (Optional[datetime.datetime]) -> datetime.timedelta
         return ZERO
 
     def dst(self, dt):
-        # type: (Union[FakeDatetime, datetime]) -> timedelta
+        # type: (datetime.datetime) -> datetime.timedelta
         return ZERO
 
     @tzname_in_python2
     def tzname(self, dt):
-        # type: (datetime) -> str
+        # type: (datetime.datetime) -> str
         return "UTC"
 
     def is_ambiguous(self, dt):
-        # type: (datetime) -> bool
+        # type: (datetime.datetime) -> bool
         """
         Whether or not the "wall time" of a given datetime is ambiguous in this
         zone.
@@ -111,7 +109,7 @@ class tzutc(datetime.tzinfo):
 
     @_validate_fromutc_inputs
     def fromutc(self, dt):
-        # type: (datetime) -> datetime
+        # type: (datetime.datetime) -> datetime.datetime
         """
         Fast track version of fromutc() returns the original ``dt`` object for
         any valid :py:class:`datetime.datetime` object.
@@ -154,7 +152,7 @@ class tzoffset(datetime.tzinfo):
         as a :py:class:`datetime.timedelta` object).
     """
     def __init__(self, name, offset):
-        # type: (Optional[str], Union[timedelta, float, int]) -> None
+        # type: (Optional[str], Union[datetime.timedelta, float, int]) -> None
         self._name = name
 
         try:
@@ -166,25 +164,25 @@ class tzoffset(datetime.tzinfo):
         self._offset = datetime.timedelta(seconds=_get_supported_offset(offset))
 
     def utcoffset(self, dt):
-        # type: (Optional[datetime]) -> timedelta
+        # type: (Optional[datetime.datetime]) -> datetime.timedelta
         return self._offset
 
     def dst(self, dt):
-        # type: (datetime) -> timedelta
+        # type: (datetime.datetime) -> datetime.timedelta
         return ZERO
 
     @tzname_in_python2
     def tzname(self, dt):
-        # type: (datetime) -> Optional[str]
+        # type: (datetime.datetime) -> Optional[str]
         return self._name
 
     @_validate_fromutc_inputs
     def fromutc(self, dt):
-        # type: (datetime) -> datetime
+        # type: (datetime.datetime) -> datetime.datetime
         return dt + self._offset
 
     def is_ambiguous(self, dt):
-        # type: (datetime) -> bool
+        # type: (datetime.datetime) -> bool
         """
         Whether or not the "wall time" of a given datetime is ambiguous in this
         zone.
@@ -236,7 +234,7 @@ class tzlocal(_tzinfo):
         self._tznames = tuple(time.tzname)
 
     def utcoffset(self, dt):
-        # type: (Optional[datetime]) -> Optional[timedelta]
+        # type: (Optional[datetime.datetime]) -> Optional[datetime.timedelta]
         if dt is None and self._hasdst:
             return None
 
@@ -246,7 +244,7 @@ class tzlocal(_tzinfo):
             return self._std_offset
 
     def dst(self, dt):
-        # type: (Optional[datetime]) -> Optional[timedelta]
+        # type: (Optional[datetime.datetime]) -> Optional[datetime.timedelta]
         if dt is None and self._hasdst:
             return None
 
@@ -257,11 +255,11 @@ class tzlocal(_tzinfo):
 
     @tzname_in_python2
     def tzname(self, dt):
-        # type: (datetime) -> str
+        # type: (datetime.datetime) -> str
         return self._tznames[self._isdst(dt)]
 
     def is_ambiguous(self, dt):
-        # type: (datetime) -> bool
+        # type: (datetime.datetime) -> bool
         """
         Whether or not the "wall time" of a given datetime is ambiguous in this
         zone.
@@ -280,12 +278,12 @@ class tzlocal(_tzinfo):
                 (naive_dst != self._naive_is_dst(dt - self._dst_saved)))
 
     def _naive_is_dst(self, dt):
-        # type: (datetime) -> int
+        # type: (datetime.datetime) -> int
         timestamp = _datetime_to_timestamp(dt)
         return time.localtime(timestamp + time.timezone).tm_isdst
 
     def _isdst(self, dt, fold_naive=True):
-        # type: (Optional[datetime], bool) -> Union[bool, int]
+        # type: (Optional[datetime.datetime], bool) -> Union[bool, int]
         # We can't use mktime here. It is unstable when deciding if
         # the hour near to a change is DST or not.
         #
@@ -769,13 +767,13 @@ class tzfile(_tzinfo):
         return self._trans_idx[idx]
 
     def _find_ttinfo(self, dt):
-        # type: (datetime) -> _ttinfo
+        # type: (datetime.datetime) -> _ttinfo
         idx = self._resolve_ambiguous_time(dt)
 
         return self._get_ttinfo(idx)
 
     def fromutc(self, dt):
-        # type: (datetime) -> datetime
+        # type: (datetime.datetime) -> datetime.datetime
         """
         The ``tzfile`` implementation of :py:func:`datetime.tzinfo.fromutc`.
 
@@ -812,7 +810,7 @@ class tzfile(_tzinfo):
         return enfold(dt_out, fold=int(fold))
 
     def is_ambiguous(self, dt, idx=None):
-        # type: (datetime, Optional[int]) -> bool
+        # type: (datetime.datetime, Optional[int]) -> bool
         """
         Whether or not the "wall time" of a given datetime is ambiguous in this
         zone.
@@ -842,7 +840,7 @@ class tzfile(_tzinfo):
         return timestamp < tt + od
 
     def _resolve_ambiguous_time(self, dt):
-        # type: (datetime) -> Optional[int]
+        # type: (datetime.datetime) -> Optional[int]
         idx = self._find_last_transition(dt)
 
         # If we have no transitions, return the index
@@ -856,7 +854,7 @@ class tzfile(_tzinfo):
         return idx - idx_offset
 
     def utcoffset(self, dt):
-        # type: (Optional[datetime]) -> Optional[timedelta]
+        # type: (Optional[datetime.datetime]) -> Optional[datetime.timedelta]
         if dt is None:
             return None
 
@@ -866,7 +864,7 @@ class tzfile(_tzinfo):
         return self._find_ttinfo(dt).delta
 
     def dst(self, dt):
-        # type: (Optional[datetime]) -> Optional[timedelta]
+        # type: (Optional[datetime.datetime]) -> Optional[datetime.timedelta]
         if dt is None:
             return None
 
@@ -884,7 +882,7 @@ class tzfile(_tzinfo):
 
     @tzname_in_python2
     def tzname(self, dt):
-        # type: (Optional[datetime]) -> Optional[str]
+        # type: (Optional[datetime.datetime]) -> Optional[str]
         if not self._ttinfo_std or dt is None:
             return None
         return self._find_ttinfo(dt).abbr
@@ -989,7 +987,7 @@ class tzrange(tzrangebase):
     def __init__(self, stdabbr, stdoffset=None,
                  dstabbr=None, dstoffset=None,
                  start=None, end=None):
-        # type: (Optional[str], Optional[Union[timedelta, int]], Optional[str], Optional[Union[timedelta, int]], Optional[Union[bool, relativedelta]], Optional[Union[bool, relativedelta]]) -> None
+        # type: (Optional[str], Optional[Union[datetime.timedelta, int]], Optional[str], Optional[Union[datetime.timedelta, int]], Optional[Union[bool, relativedelta]], Optional[Union[bool, relativedelta]]) -> None
 
         global relativedelta
         from dateutil import relativedelta
@@ -1035,7 +1033,7 @@ class tzrange(tzrangebase):
         self.hasdst = bool(self._start_delta)
 
     def transitions(self, year):
-        # type: (int) -> Optional[Tuple[datetime, datetime]]
+        # type: (int) -> Optional[Tuple[datetime.datetime, datetime.datetime]]
         """
         For a given year, get the DST on and off transition times, expressed
         always on the standard time side. For zones with no transitions, this
@@ -1072,7 +1070,7 @@ class tzrange(tzrangebase):
 
     @property
     def _dst_base_offset(self):
-        # type: () -> timedelta
+        # type: () -> datetime.timedelta
         return self._dst_base_offset_
 
 
@@ -1222,7 +1220,7 @@ class _tzicalvtz(_tzinfo):
         self._cache_lock = _thread.allocate_lock()
 
     def _find_comp(self, dt):
-        # type: (datetime) -> _tzicalvtzcomp
+        # type: (datetime.datetime) -> _tzicalvtzcomp
         if len(self._comps) == 1:
             return self._comps[0]
 
@@ -1268,7 +1266,7 @@ class _tzicalvtz(_tzinfo):
         return lastcomp
 
     def _find_compdt(self, comp, dt):
-        # type: (_tzicalvtzcomp, datetime) -> datetime
+        # type: (_tzicalvtzcomp, datetime.datetime) -> datetime.datetime
         if comp.tzoffsetdiff < ZERO and self._fold(dt):
             dt -= comp.tzoffsetdiff
 
@@ -1277,14 +1275,14 @@ class _tzicalvtz(_tzinfo):
         return compdt
 
     def utcoffset(self, dt):
-        # type: (datetime) -> timedelta
+        # type: (datetime.datetime) -> datetime.timedelta
         if dt is None:
             return None
 
         return self._find_comp(dt).tzoffsetto
 
     def dst(self, dt):
-        # type: (datetime) -> timedelta
+        # type: (datetime.datetime) -> datetime.timedelta
         comp = self._find_comp(dt)
         if comp.isdst:
             return comp.tzoffsetdiff
@@ -1293,7 +1291,7 @@ class _tzicalvtz(_tzinfo):
 
     @tzname_in_python2
     def tzname(self, dt):
-        # type: (datetime) -> str
+        # type: (datetime.datetime) -> str
         return self._find_comp(dt).tzname
 
     def __repr__(self):
@@ -1738,7 +1736,7 @@ del __get_gettz
 
 
 def datetime_exists(dt, tz=None):
-    # type: (datetime, Optional[Any]) -> bool
+    # type: (datetime.datetime, Optional[Any]) -> bool
     """
     Given a datetime and a time zone, determine whether or not a given datetime
     would fall in a gap.
@@ -1773,7 +1771,7 @@ def datetime_exists(dt, tz=None):
 
 
 def datetime_ambiguous(dt, tz=None):
-    # type: (datetime, Optional[Any]) -> bool
+    # type: (datetime.datetime, Optional[Any]) -> bool
     """
     Given a datetime and a time zone, determine whether or not a given datetime
     is ambiguous (i.e if there are two times differentiated only by their DST
@@ -1820,7 +1818,7 @@ def datetime_ambiguous(dt, tz=None):
 
 
 def resolve_imaginary(dt):
-    # type: (datetime) -> datetime
+    # type: (datetime.datetime) -> datetime.datetime
     """
     Given a datetime that may be imaginary, return an existing datetime.
 
@@ -1867,7 +1865,7 @@ def resolve_imaginary(dt):
 
 
 def _datetime_to_timestamp(dt):
-    # type: (datetime) -> float
+    # type: (datetime.datetime) -> float
     """
     Convert a :class:`datetime.datetime` object to an epoch timestamp in
     seconds since January 1, 1970, ignoring the time zone.

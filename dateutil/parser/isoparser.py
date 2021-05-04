@@ -10,13 +10,12 @@ ISO-8601 specification.
 from datetime import datetime, timedelta, time, date
 import calendar
 from dateutil import tz
+from typing import Callable, List, Optional, Tuple, Union  # noqa: for type checking
 
 from functools import wraps
 
 import re
 import six
-from dateutil.tz.tz import tzoffset, tzutc
-from typing import Callable, List, Optional, Tuple, Union
 
 __all__ = ["isoparse", "isoparser"]
 
@@ -187,7 +186,7 @@ class isoparser(object):
 
     @_takes_ascii
     def parse_tzstr(self, tzstr, zero_as_utc=True):
-        # type: (bytes, bool) -> Union[tzutc, tzoffset]
+        # type: (bytes, bool) -> Union[tz.tzutc, tz.tzoffset]
         """
         Parse a valid ISO time zone string.
 
@@ -340,7 +339,7 @@ class isoparser(object):
         return week_1 + timedelta(days=week_offset)
 
     def _parse_isotime(self, timestr):
-        # type: (bytes) -> Union[List[Union[int, tzoffset]], List[Optional[int]], List[Union[int, tzutc]]]
+        # type: (bytes) -> Union[List[Union[int, tz.tzoffset]], List[Optional[int]], List[Union[int, tz.tzutc]]]
         len_str = len(timestr)
         components = [0, 0, 0, 0, None]
         pos = 0
@@ -389,7 +388,7 @@ class isoparser(object):
         return components
 
     def _parse_tzstr(self, tzstr, zero_as_utc=True):
-        # type: (bytes, bool) -> Union[tzutc, tzoffset]
+        # type: (bytes, bool) -> Union[tz.tzutc, tz.tzoffset]
         if tzstr == b'Z' or tzstr == b'z':
             return tz.UTC
 

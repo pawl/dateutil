@@ -5,7 +5,6 @@ Western, Orthodox or Julian algorithms.
 """
 
 import datetime
-from datetime import date
 
 __all__ = ["easter", "EASTER_JULIAN", "EASTER_ORTHODOX", "EASTER_WESTERN"]
 
@@ -15,7 +14,7 @@ EASTER_WESTERN = 3
 
 
 def easter(year, method=EASTER_WESTERN):
-    # type: (int, int) -> date
+    # type: (int, int) -> datetime.date
     """
     This method was ported from the work done by GM Arts,
     on top of the algorithm by Claus Tondering, which was

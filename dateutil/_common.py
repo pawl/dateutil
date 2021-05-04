@@ -1,7 +1,7 @@
 """
 Common code used in multiple modules.
 """
-from typing import Optional
+from typing import Optional  # noqa: for type checking
 
 
 class weekday(object):

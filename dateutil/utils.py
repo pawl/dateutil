@@ -7,15 +7,14 @@ datetimes.
 """
 from __future__ import unicode_literals
 
-from datetime import datetime, time
-from datetime import timedelta
-from dateutil.tz.tz import tzfile, tzutc
-from freezegun.api import FakeDatetime
-from typing import Optional, Union
+from datetime import datetime, time, timedelta  # noqa: for type checking
+from typing import Optional, Union  # noqa: for type checking
+
+from dateutil.tz import tzfile, tzutc  # noqa: for type checking
 
 
 def today(tzinfo=None):
-    # type: (Optional[Union[tzfile, tzutc]]) -> FakeDatetime
+    # type: (Optional[Union[tzfile, tzutc]]) -> datetime
     """
     Returns a :py:class:`datetime` representing the current day at midnight
 
